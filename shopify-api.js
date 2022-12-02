@@ -1,11 +1,23 @@
-const express = require("express");
+import express from "express";
+import http from "http";
+import dotenv from "dotenv";
+import { Shopify, ApiVersion } from "@shopify/shopify-api";
+
+import { getOrders, getOrder, createOrder } from "./database.js";
+import { getShopifyOrderDetails } from "./common.js";
+
 const app = express();
-const http = require("http");
+dotenv.config();
 
-const Shopify = require("@shopify/shopify-api").Shopify;
-const ApiVersion = require("@shopify/shopify-api").ApiVersion;
-
-require("dotenv").config();
+const requiredParamsToCreateOrder = [
+  "orderNumber",
+  "date",
+  "customer",
+  "total",
+  "items",
+  "paymentStatus",
+  "itemCount",
+];
 
 const { API_KEY, API_SECRET_KEY, SCOPES, SHOP, HOST, HOST_SCHEME } =
   process.env;
@@ -76,3 +88,37 @@ httpServer.listen(PORT, () =>
 // Get API call
 // https://{API_KEY}:{ADMIN_API}@{SHOP}/admin/api/2022-10/orders.json
 // URL : https://7fd6336abf60b6b04e55afe4bd791258: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@cloud9stores.myshopify.com/admin/api/2022-10/orders.json
+
+// the orders "variable" can be replaced with "products".
+// we can dump this json data by taking only the required key value pairs
+// form the table columns required.
+
+app.get("/shopify/orders/fetch/orders-from-shopify", async (req, res) => {
+  try {
+    let orderDataResposne = await getShopifyOrderDetails();
+    res.send(orderDataResposne);
+  } catch (error) {}
+});
+
+app.get("/shopify/orders/fetch", async (req, res) => {
+  try {
+    let allOrders = await getOrders();
+    res.send(allOrders);
+  } catch (error) {
+    throw error;
+  }
+});
+
+app.get("/shopify/order/:id", async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    let order = await getOrder(orderId);
+    res.send(order);
+  } catch (error) {
+    throw error;
+  }
+});
+
+app.post("/shopify/order-record/create", async (req, res) => {
+  const payload = req.body;
+});
