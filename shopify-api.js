@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 // import { Shopify, ApiVersion } from "@shopify/shopify-api";
 
 import { getOrders, getOrder, createOrder } from "./database.js";
-import { getShopifyOrderDetails } from "./common.js";
+import { formatOrderData, getShopifyOrderDetails } from "./common.js";
 
 const app = express();
 dotenv.config();
@@ -24,7 +24,9 @@ const PORT = process.env.PORT || 3000;
 app.get("/shopify/orders/fetch/orders-from-shopify", async (req, res) => {
   try {
     let orderDataResposne = await getShopifyOrderDetails();
-    res.send(orderDataResposne);
+    let orderData = await formatOrderData(orderDataResposne);
+    // console.log("orderData : ", orderData);
+    res.send(orderData);
   } catch (error) {}
 });
 
