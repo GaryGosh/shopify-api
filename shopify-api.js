@@ -25,8 +25,14 @@ app.get("/shopify/orders/fetch/orders-from-shopify", async (req, res) => {
   try {
     let orderDataResposne = await getShopifyOrderDetails();
     let orderData = await formatOrderData(orderDataResposne);
-    // console.log("orderData : ", orderData);
-    res.send(orderData);
+
+    let result = [];
+    for (let i = 0; i < orderData.length; i++) {
+      let response = await createOrder(orderData[i]);
+      result.push(response);
+    }
+
+    res.send(result);
   } catch (error) {}
 });
 

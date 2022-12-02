@@ -65,21 +65,19 @@ export async function formatOrderData(data) {
           formattedData[
             "customer"
           ] = `${el.customer.first_name} ${el.customer.last_name}`;
-          formattedData["created"] = el.customer.created_at
+          formattedData["date"] = el.customer.created_at
             .slice(0, 19)
             .replace("T", " ");
         } else {
           formattedData["customer"] = "Unknown User";
-          formattedData["created"] = el.created_at
-            .slice(0, 19)
-            .replace("T", " ");
+          formattedData["date"] = el.created_at.slice(0, 19).replace("T", " ");
         }
-        formattedData["items"] = el.line_items.length;
+        formattedData["itemCount"] = el.line_items.length;
         let itemDetails = "";
         (el.line_items || []).forEach((item) => {
           itemDetails = itemDetails + `${item.name} `;
         });
-        formattedData["itemDetails"] = itemDetails;
+        formattedData["items"] = itemDetails;
 
         ordersData.push(formattedData);
       });
