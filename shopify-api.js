@@ -11,6 +11,7 @@ dotenv.config();
 
 app.use(express.json());
 
+// Can be used for payload validation
 const requiredParamsToCreateOrder = [
   "orderNumber",
   "date",
@@ -78,9 +79,7 @@ app.post("/shopify/webhook/order-creation", async (req, res) => {
 
   let newItemId = result[0].insertId;
   res.send(getOrderById(newItemId));
-  // res.send(
-  //   "Shopify new order request has received and entry has been cerated in the record"
-  // );
+  // res.send("Shopify new order request has received and entry has been cerated in the record");
 });
 
 const httpServer = http.createServer(app);
@@ -91,8 +90,7 @@ httpServer.listen(PORT, () =>
 
 // shopify code that can be used later
 
-// const { API_KEY, API_SECRET_KEY, SCOPES, SHOP, HOST, HOST_SCHEME } =
-//   process.env;
+// const { API_KEY, API_SECRET_KEY, SCOPES, SHOP, HOST, HOST_SCHEME } = process.env;
 
 // Shopify.Context.initialize({
 //   API_KEY,
