@@ -88,3 +88,40 @@ export async function formatOrderData(data) {
     console.log(error);
   }
 }
+
+export async function formatFreshOrderData(data) {
+  try {
+    let ordersData = [];
+    if (data && data["line_items"] && data["line_items"].length) {
+      (data["line_items"] || []).forEach((el) => {
+        let formattedData = {};
+        formattedData["total"] = data.total_price;
+        formattedData["paymentStatus"] = data.financial_status;
+        formattedData["orderNumber"] = data.order_number;
+        if (data.customer) {
+          formattedData[
+            "customer"
+          ] = `${data.customer.first_name} ${data.customer.last_name}`;
+          formattedData["date"] = data.customer.created_at
+            .slice(0, 19)
+            .replace("T", " ");
+        } else {
+          formattedData["customer"] = "Unknown User";
+          formattedData["date"] = data.created_at
+            .slice(0, 19)
+            .replace("T", " ");
+        }
+        formattedData["itemCount"] = el.quantity;
+
+        formattedData["items"] = el.name;
+        formattedData["itemCost"] = el.price;
+
+        ordersData.push(formattedData);
+      });
+    }
+
+    return ordersData;
+  } catch (error) {
+    console.log(error);
+  }
+}

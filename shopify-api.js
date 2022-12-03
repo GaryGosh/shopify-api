@@ -4,7 +4,11 @@ import dotenv from "dotenv";
 // import { Shopify, ApiVersion } from "@shopify/shopify-api";
 
 import { getOrders, getOrder, createOrder, getOrderById } from "./database.js";
-import { formatOrderData, getShopifyOrderDetails } from "./common.js";
+import {
+  formatFreshOrderData,
+  formatOrderData,
+  getShopifyOrderDetails,
+} from "./common.js";
 
 const app = express();
 dotenv.config();
@@ -35,6 +39,7 @@ app.get("/shopify/orders/fetch/orders-from-shopify", async (req, res) => {
     let orderData = await formatOrderData(orderDataResposne);
 
     let result = [];
+
     for (let i = 0; i < orderData.length; i++) {
       let response = await createOrder(orderData[i]);
       result.push(response);
@@ -67,10 +72,11 @@ app.get("/shopify/order/:id", async (req, res) => {
 
 app.post("/shopify/webhook/order-creation", async (req, res) => {
   // console.log("payload : ", req.body);
-  const payload = {};
-  payload["orders"] = [req.body];
+  let payload = {};
+  payload = req.body;
 
-  let orderData = await formatOrderData(payload);
+  let orderData = await formatFreshOrderData(payload);
+  // console.log("orders data formtatted : ", orderData);
   let result = [];
   for (let i = 0; i < orderData.length; i++) {
     let response = await createOrder(orderData[i]);

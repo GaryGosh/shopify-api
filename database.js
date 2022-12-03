@@ -51,12 +51,22 @@ export async function createOrder(args) {
     items,
     paymentStatus,
     itemCount,
+    itemCost,
   } = args;
   const [result] = await pool.query(
     `
-    INSERT INTO orders (order_number, date, customer, total, items, payment_status, item_count)
-    VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [orderNumber, date, customer, total, items, paymentStatus, itemCount]
+    INSERT INTO orders (order_number, date, customer, total, items, payment_status, item_count, item_cost)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      orderNumber,
+      date,
+      customer,
+      total,
+      items,
+      paymentStatus,
+      itemCount,
+      itemCost,
+    ]
   );
 
   return result;
