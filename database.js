@@ -29,6 +29,16 @@ export async function getOrder(orderNumber) {
   return rows[0];
 }
 
+// use for showing newly added record data as repose body
+export async function getOrderById(id) {
+  const [rows] = await pool.query(
+    `
+        SELECT * FROM orders WHERE id = ?`,
+    [id]
+  );
+  return rows[0];
+}
+
 // const order = await getOrder(2001);
 // console.log("searched order : ", order);
 

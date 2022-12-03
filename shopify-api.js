@@ -3,11 +3,13 @@ import http from "http";
 import dotenv from "dotenv";
 // import { Shopify, ApiVersion } from "@shopify/shopify-api";
 
-import { getOrders, getOrder, createOrder } from "./database.js";
+import { getOrders, getOrder, createOrder, getOrderById } from "./database.js";
 import { formatOrderData, getShopifyOrderDetails } from "./common.js";
 
 const app = express();
 dotenv.config();
+
+app.use(express.json());
 
 const requiredParamsToCreateOrder = [
   "orderNumber",
@@ -21,6 +23,11 @@ const requiredParamsToCreateOrder = [
 
 const PORT = process.env.PORT || 3000;
 
+app.get("/", (req, res) => {
+  console.log("total awesome !");
+  res.send("Welcome to shopify backend !");
+});
+
 app.get("/shopify/orders/fetch/orders-from-shopify", async (req, res) => {
   try {
     let orderDataResposne = await getShopifyOrderDetails();
@@ -33,7 +40,9 @@ app.get("/shopify/orders/fetch/orders-from-shopify", async (req, res) => {
     }
 
     res.send(result);
-  } catch (error) {}
+  } catch (error) {
+    throw error;
+  }
 });
 
 app.get("/shopify/orders/fetch", async (req, res) => {
@@ -55,8 +64,23 @@ app.get("/shopify/order/:id", async (req, res) => {
   }
 });
 
-app.post("/shopify/order-record/create", async (req, res) => {
-  const payload = req.body;
+app.post("/shopify/webhook/order-creation", async (req, res) => {
+  // console.log("payload : ", req.body);
+  const payload = {};
+  payload["orders"] = [req.body];
+
+  let orderData = await formatOrderData(payload);
+  let result = [];
+  for (let i = 0; i < orderData.length; i++) {
+    let response = await createOrder(orderData[i]);
+    result.push(response);
+  }
+
+  let newItemId = result[0].insertId;
+  res.send(getOrderById(newItemId));
+  // res.send(
+  //   "Shopify new order request has received and entry has been cerated in the record"
+  // );
 });
 
 const httpServer = http.createServer(app);
