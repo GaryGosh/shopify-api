@@ -3,7 +3,13 @@ import http from "http";
 import dotenv from "dotenv";
 // import { Shopify, ApiVersion } from "@shopify/shopify-api";
 
-import { getOrders, getOrder, createOrder, getOrderById } from "./database.js";
+import {
+  getOrders,
+  getOrder,
+  createOrder,
+  getOrderById,
+  testConnection,
+} from "./database.js";
 import {
   formatFreshOrderData,
   formatOrderData,
@@ -31,6 +37,12 @@ const PORT = process.env.PORT || 3000;
 app.get("/", (req, res) => {
   console.log("total awesome !");
   res.send("Welcome to shopify backend !");
+});
+
+app.get("/test", async (req, res) => {
+  let result = await testConnection();
+  console.log("result : ", result);
+  res.send(result);
 });
 
 app.get("/shopify/orders/fetch/orders-from-shopify", async (req, res) => {

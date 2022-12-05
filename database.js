@@ -5,6 +5,7 @@ dotenv.config();
 
 const pool = mysql
   .createPool({
+    socketPath: process.env.SOCKET_PATH,
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
@@ -15,6 +16,26 @@ const pool = mysql
 export async function getOrders() {
   const [rows] = await pool.query("SELECT * FROM orders");
   return rows;
+}
+
+export async function testConnection() {
+  return new Promise((resolve, reject) => {
+    console.log("inside test connection");
+    pool.getConnection((err, con) => {
+      try {
+        if (con) {
+          console.log("connection is present : ", con);
+          con.release();
+          resolve({ status: "success", data: "MySQL connected.", con: pool });
+        }
+      } catch (err) {
+        console.log("error occured : ", err);
+        reject({ status: "failed", error: `MySQL error. ${err}` });
+      }
+      console.log("complete error : ", err);
+      resolve({ status: "failed", error: "Error connecting to MySQL." });
+    });
+  });
 }
 
 // const orders = await getOrders();
@@ -53,6 +74,7 @@ export async function createOrder(args) {
     itemCount,
     itemCost,
   } = args;
+
   const [result] = await pool.query(
     `
     INSERT INTO orders (order_number, date, customer, total, items, payment_status, item_count, item_cost)
